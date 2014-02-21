@@ -19,7 +19,7 @@
 
 #include <ctype.h>
 #include <sys/uio.h>
-#include <python2.6/Python.h>
+#include <Python.h>
 
 #ifndef _CONFIG_H
 #define _CONFIG_H
@@ -2322,8 +2322,8 @@ init (xlator_t *this)
         PyObject                *py_init_func   = NULL;
         PyObject                *py_args        = NULL;
         PyObject                *syspath        = NULL;
-        PyObject                *path           = NULL;
-        static gf_boolean_t      py_inited      = _gf_false;
+	PyObject                *path           = NULL;
+	static gf_boolean_t      py_inited      = _gf_false;
         void *                   err_cleanup    = &&err_return;
 
         if (dict_get_str(this->options,"module-name",&module_name) != 0) {
@@ -2331,14 +2331,14 @@ init (xlator_t *this)
                 return -1;
         }
 
-        priv = GF_CALLOC (1, sizeof (glupy_private_t), gf_glupy_mt_priv);
+	priv = GF_CALLOC (1, sizeof (glupy_private_t), gf_glupy_mt_priv);
         if (!priv) {
                 goto *err_cleanup;
         }
         this->private = priv;
         err_cleanup = &&err_free_priv;
 
-        if (!py_inited) {
+	if (!py_inited) {
                 Py_Initialize();
                 PyEval_InitThreads();
 #if 0
@@ -2350,13 +2350,13 @@ init (xlator_t *this)
                 py_inited = _gf_true;
         }
 
-        /* Adjust python's path */
-        syspath = PySys_GetObject("path");
-        path = PyString_FromString(GLUSTER_PYTHON_PATH);
-        PyList_Append(syspath, path);
-        Py_DECREF(path);
+	/* Adjust python's path */
+	syspath = PySys_GetObject("path");
+	path = PyString_FromString(GLUSTER_PYTHON_PATH);
+	PyList_Append(syspath, path);
+	Py_DECREF(path);
 
-        py_mod_name = PyString_FromString(module_name);
+	py_mod_name = PyString_FromString(module_name);
         if (!py_mod_name) {
                 gf_log (this->name, GF_LOG_ERROR, "could not create name");
                 if (PyErr_Occurred()) {
@@ -2365,7 +2365,7 @@ init (xlator_t *this)
                 goto *err_cleanup;
         }
 
-        gf_log (this->name, GF_LOG_ERROR, "py_mod_name = %s", module_name);
+        gf_log (this->name, GF_LOG_DEBUG, "py_mod_name = %s", module_name);
         priv->py_module = PyImport_Import(py_mod_name);
         Py_DECREF(py_mod_name);
         if (!priv->py_module) {
@@ -2375,6 +2375,7 @@ init (xlator_t *this)
                 }
                 goto *err_cleanup;
         }
+        gf_log (this->name, GF_LOG_INFO, "Import of %s succeeded", module_name);
         err_cleanup = &&err_deref_module;
 
         py_init_func = PyObject_GetAttrString(priv->py_module, "xlator");
@@ -2407,7 +2408,7 @@ init (xlator_t *this)
                 }
                 goto *err_cleanup;
         }
-        gf_log (this->name, GF_LOG_INFO, "init returned %p", priv->py_xlator);
+        gf_log (this->name, GF_LOG_DEBUG, "init returned %p", priv->py_xlator);
 
         return 0;
 
@@ -2424,19 +2425,10 @@ err_return:
 void
 fini (xlator_t *this)
 {
-        int              i = 0;
         glupy_private_t *priv = this->private;
 
         if (!priv)
                 return;
-        for (i = 0; i < GLUPY_N_FUNCS; ++i) {
-                if (priv->fops[i]) {
-                        Py_DECREF(priv->fops[i]);
-                }
-                if (priv->cbks[i]) {
-                        Py_DECREF(priv->fops[i]);
-                }
-        }
         Py_DECREF(priv->py_xlator);
         Py_DECREF(priv->py_module);
         this->private = NULL;
