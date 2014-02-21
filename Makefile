@@ -11,7 +11,7 @@ HOST_OS  = GF_LINUX_HOST_OS
 # You shouldn't need to change anything below here.
 XLATOR_DIR = $(GLFS_ROOT)/glusterfs/$(GLFS_VERS)/xlator/features
 GLUPY_DIR = $(XLATOR_DIR)/glupy/
-PY_FILES = debug-trace.py gluster.py helloworld.py negative.py
+PY_FILES = debug-trace.py helloworld.py negative.py
 
 CFLAGS	= -fPIC -Wall -O0 -g \
 	  -DHAVE_CONFIG_H -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D$(HOST_OS) \
@@ -32,7 +32,6 @@ install: $(TARGET)
 uninstall: $(TARGET)
 	rm -f $(XLATOR_DIR)/$(TARGET)
 	rm -f $(GLUPY_DIR)/debug-trace.py
-	rm -f $(GLUPY_DIR)/gluster.py
 	rm -f $(GLUPY_DIR)/helloworld.py
 	rm -f $(GLUPY_DIR)/negative.py
 	rmdir --ignore-fail-on-non-empty $(GLUPY_DIR)

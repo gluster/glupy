@@ -54,13 +54,14 @@ __2. Compile and install Glupy__
     $ make
     $ sudo make install
 
-__3. Let Python find gluster.py__
+__3. Let Python find glupy.py__
 
-Now copy gluster.py to some place in your PYTHONPATH.
+Now copy glupy.py to the "gluster" subdirectory in your Python
+site-packages directory.
 
 On EL6/CentOS6 with GlusterFS compiled from git master, this would work:
 
-    $ sudo cp gluster.py /usr/lib64/glusterfs/3git/xlator/features/
+    $ sudo cp glupy.py /usr/lib/python2.6/site-packages/gluster/
 
 That's it, Glupy is now installed. :)
 
@@ -73,8 +74,8 @@ This isn't yet quite as straight forward as it could be.
 When you've created a Glupy based translator you want to use,
 you'll need to manually edit your .vol file to include it.
 
-Glupy comes with an example "negative lookup" translator
-you can start with.  It's the _negative.py_ file in this repo.
+Glupy comes with an example "hello world" translator you can
+start with.  It's the _helloworld.py_ file in this repo.
 
 To add a translator to your .vol file, open it in a text
 editor then:
@@ -86,14 +87,14 @@ editor then:
 The filename of your translator (without the .py extension)
 is passed to Glupy using the "module-name" option.
 
-So, for the "negative lookup" example translator, it would
+So, for the "hello world" example translator, it would
 be something like this:
 
     $ sudo vi /var/lib/glusterd/nfs/nfs-server.vol
 
-    volume myvolume-negative
+    volume myvolume-helloworld
         type features/glupy
-        option module-name negative
+        option module-name helloworld
         subvolumes myvolume-write-behind
     end-volume
 
@@ -109,4 +110,5 @@ telling it to use your new .vol file.  eg:
 
     $ sudo glusterfs -f /var/lib/glusterd/nfs/nfs-server.vol --debug
 
-Things should now work normally. :)
+Things should now work normally, and you can see logging
+output from volume operations on standard out. :)
