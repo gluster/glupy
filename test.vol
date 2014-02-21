@@ -5,6 +5,6 @@ end-volume
 
 volume vol-glupy
     type features/glupy
-    option module-name debug-trace
+    option module-name helloworld
     subvolumes vol-posix
 end-volume
